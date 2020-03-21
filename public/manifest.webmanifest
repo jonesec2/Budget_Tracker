@@ -1,6 +1,6 @@
 {
-   "name": "Images App",
-   "short_name": "Images App",
+   "name": "Budget Tracker",
+   "short_name": "Budget_Tracker",
    "icons": [
       {
          "src": "public/icons/icon-192x192.png",
