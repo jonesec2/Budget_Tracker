@@ -66,30 +66,27 @@ self.addEventListener("fetch", event => {
          caches.open(RUNTIME_CACHE).then(cache => {
             return fetch(event.request)
                .then(response => {
-                  cache.put(event.request, response.clone());
+                  // If the response was good, clone it and store it in the cache.
+                  if (response.status === 200) {
+                     cache.put(event.request.url, response.clone());
+                  }
+
                   return response;
                })
-               .catch(() => caches.match(event.request));
-         })
+               .catch(err => {
+                  // Network request failed, try to get it from the cache.
+                  return cache.match(event.request);
+               });
+         }).catch(err => console.log(err))
       );
+
       return;
    }
 
    // use cache first for all other requests for performance
    event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-         if (cachedResponse) {
-            return cachedResponse;
-         }
-
-         // request is not in cache. make network request and cache the response
-         return caches.open(RUNTIME_CACHE).then(cache => {
-            return fetch(event.request).then(response => {
-               return cache.put(event.request, response.clone()).then(() => {
-                  return response;
-               });
-            });
-         });
+      caches.match(event.request).then(function(response) {
+        return response || fetch(event.request);
       })
-   );
+    );
 });
