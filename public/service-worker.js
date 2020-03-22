@@ -1,7 +1,7 @@
 const FILES_TO_CACHE = [
    "/",
    "/index.html",
-   "/style.css",
+   "/styles.css",
    "/index.js",
    "/db.js",
    "/manifest.webmanifest",
@@ -10,16 +10,14 @@ const FILES_TO_CACHE = [
    "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
    "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"
 
-
-
 ];
 
-const STATIC_CACHE = "static-cache-v1";
-const RUNTIME_CACHE = "runtime-cache";
+const CACHE_NAME = "static-cache-v1";
+const DATA_CACHE_NAME = "data-cache-v1";
 
 self.addEventListener("install", event => {
    event.waitUntil(
-      caches.open(STATIC_CACHE).then(cache => {
+      caches.open(CACHE_NAME).then(cache => {
          console.log("Your files were pre-cached successfully!");
          return cache.addAll(FILES_TO_CACHE);
       })
@@ -30,7 +28,7 @@ self.addEventListener("install", event => {
 
 // The activate handler takes care of cleaning up old caches.
 self.addEventListener("activate", event => {
-   const currentCaches = [STATIC_CACHE, RUNTIME_CACHE];
+   const currentCaches = [CACHE_NAME, DATA_CACHE_NAME];
    event.waitUntil(
       caches
          .keys()
@@ -65,7 +63,7 @@ self.addEventListener("fetch", event => {
    if (event.request.url.includes("/api/")) {
       // make network request and fallback to cache if network request fails (offline)
       event.respondWith(
-         caches.open(RUNTIME_CACHE).then(cache => {
+         caches.open(DATA_CACHE_NAME).then(cache => {
             return fetch(event.request)
                .then(response => {
                   // If the response was good, clone it and store it in the cache.
